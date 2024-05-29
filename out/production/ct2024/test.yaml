@@ -1,0 +1,461 @@
+name: test
+source code: |-
+  input: '11^100'
+  blank: ' '
+  start state: start
+  table:
+    start:
+      [0,1]: {L: init1}
+    init1:
+      ' ': {write: '|', L: init2}
+    init2:
+      ' ': {write: B, L: init3}
+    init3:
+      ' ': {write: 1, L: init4}
+    init4:
+      ' ': {write: '*', R: rightv1}
+    rightv1:
+      [0,1,'*','|','B','^']: R
+      ' ': {L: readC}
+      
+    readC:
+      0: {L: checkFull0}
+      1: {R: decrement}
+      
+    checkFull0:
+      0: {L: checkFull0}
+      '^': {R: rightv5}
+      1: {R: rightv4}
+      
+    rightv4:
+      [0,1]: {R: rightv4}
+      ' ': {L: decrement}
+      
+    rightv5:
+      0: {R: rightv5}
+      ' ': {L: tidyv1}
+      
+    tidyv1:
+      [0,1,'^','|']: {write: ' ', L: tidyv1}
+      'B': {write: ' ', L: tidyv2}
+    
+    tidyv2:
+      [0,1]: {L: tidyv2}
+      '*': {write: ' ', R: done}
+      
+    done:
+    
+    decrement:
+      ' ': {L: decrement}
+      1: {write: 0, L: leftv1}
+      0: {write: 1, L: decrement}
+      '^': {L: leftv1}
+      
+    leftv1:
+      [0,1]: {L: leftv1}
+      '^': {L: duplicatex}
+      
+    duplicatex:
+      1: {write: '_', L: dup1}
+      0: {write: '_', L: dup0}
+      
+    dup1:
+      [0,1,'|','*','B']: {L: dup1}
+      ' ': {write: 1, R: backdup1}
+    dup0:
+      [0,1,'|','*','B']: {L: dup0}
+      ' ': {write: 0, R: backdup0}
+    
+    backdup1:
+      '_': {write: 1, L: duplicatex}
+      [0,1,'*','B']: {R: backdup1}
+      '|': {R: checkdonedupx1}
+    backdup0:
+      '_': {write: 0, L: duplicatex}
+      [0,1,'*','B']: {R: backdup0}
+      '|': {R: checkdonedupx0}
+    
+    checkdonedupx1:
+      '_': {write: 1, L: leftv2}
+      [0,1]: {R: backdup1}
+    checkdonedupx0:
+      '_': {write: 0, L: leftv2}
+      [0,1]: {R: backdup0}
+      
+    leftv2:
+      [0,1,'*','|','B']: {L: leftv2}
+      ' ': {R: startmult}
+      
+    donemult:
+      [0,1]: {L: leftv3}
+    
+    leftv3:
+      [0,1]: {L: leftv3}
+      ' ': {write: 's', R: rightv2}
+    rightv2:
+      [0,1]: {R: rightv2}
+      ' ': {L: shiftAns}
+      'B': {R: rightv1}
+      
+    shiftAns:
+      0: {write: 'b', R: shiftAns0}
+      1: {write: 'b', R: shiftAns1}
+      's': {write: ' ', R: rightv3}
+      
+    rightv3:
+      ' ': {R: rightv3}
+      [0,1]: {L: init4}
+      
+    shiftAns0:
+      ' ': {R: shiftAns0}
+      [0,1,'B']: {L: back1shiftAns0}
+    shiftAns1:
+      ' ': {R: shiftAns1}
+      [0,1,'B']: {L: back1shiftAns1}
+      
+    back1shiftAns0:
+      ' ': {write: 0, L: backShiftAns}
+    back1shiftAns1:
+      ' ': {write: 1, L: backShiftAns}
+    
+    backShiftAns:
+      ' ': {L: backShiftAns}
+      'b': {write: ' ', L: shiftAns}
+      [0,1]: {R: rightv2}
+    
+    
+    
+    
+    
+    
+    # Prefix the input with a '+', and go to the rightmost digit.
+    startmult:
+      [0,1]: {L: init}
+    init:
+      ' ': {write: '+', R: rightv0}
+    rightv0:
+      [0,1,'*']: R
+      'B': {L: readB}
+
+    # Read and erase the last digit of the multiplier.
+    # If it's 1, add the current multiplicand.
+    # In any case, double the multiplicand afterwards.
+    readB:
+      0: {write: ' ', L: doubleL}
+      1: {write: ' ', L: addA}
+    addA:
+      [0,1]: L
+      '*': {L: read} # enter adder
+    # Double the multiplicand by appending a 0.
+    doubleL:
+      [0,1]: L
+      '*': {write: 0, R: shift}
+    double: # return from adder
+      [0,1,+]: R
+      '*': {write: 0, R: shift}
+    # Make room by shifting the multiplier right 1 cell.
+    shift:
+      0: {write: '*', R: shift0}
+      1: {write: '*', R: shift1}
+      ' ': {L: tidyv0} # base case: multiplier = 0
+    shift0:
+      0:   {R: shift0}
+      1:   {write: 0, R: shift1}
+      ' ': {write: 0, R: rightv0}
+    shift1:
+      0:   {write: 1, R: shift0}
+      1:   {R: shift1}
+      ' ': {write: 1, R: rightv0}
+
+    tidyv0:
+      [0,1]: {write: ' ', L}
+      +: {write: ' ', L: donemult}
+
+  # This is the 'binary addition' machine almost verbatim.
+  # It's adjusted to keep the '+'
+  # and to lead to another state instead of halting.
+    read:
+      0: {write: c, L: have0}
+      1: {write: c, L: have1}
+      +: {L: rewrite} # keep the +
+    have0: {[0,1]: L, +: {L: add0}}
+    have1: {[0,1]: L, +: {L: add1}}
+    add0:
+      [0,' ']: {write: O, R: back0}
+      1      : {write: I, R: back0}
+      [O,I]  : L
+    add1:
+      [0,' ']: {write: I, R: back1}
+      1      : {write: O, L: carry}
+      [O,I]  : L
+    carry:
+      [0,' ']: {write: 1, R: back1}
+      1      : {write: 0, L}
+    back0:
+      [0,1,O,I,+]: R
+      c: {write: 0, L: read}
+    back1:
+      [0,1,O,I,+]: R
+      c: {write: 1, L: read}
+    rewrite:
+      O: {write: 0, L}
+      I: {write: 1, L}
+      [0,1]: L
+      ' ': {R: double} # when done, go to the 'double' state
+positions:
+  start: {x: 69.29, y: 239.09}
+  init1: {x: 154.44, y: 304.27, fixed: false}
+  init2: {x: 292.62, y: 217.6}
+  init3: {x: 209.79, y: 253.56}
+  init4: {x: 420.07, y: 239.01}
+  rightv1: {x: 540.89, y: 111.01, fixed: false}
+  readC: {x: 622.26, y: 285.32}
+  checkFull0: {x: 606.19, y: 440.93, fixed: false}
+  rightv4: {x: 740.22, y: 480, fixed: false}
+  rightv5: {x: 439.03, y: 392.86}
+  tidyv1: {x: 251.17, y: 480, fixed: false}
+  tidyv2: {x: 66.45, y: 480, fixed: false}
+  done: {x: 20, y: 337.72, fixed: false}
+  decrement: {x: 578, y: 480, fixed: false}
+  leftv1: {x: 378.33, y: 480, fixed: false}
+  duplicatex: {x: 186.73, y: 480, fixed: false}
+  dup1: {x: 35.23, y: 378.48, fixed: false}
+  dup0: {x: 296.69, y: 339.99}
+  backdup1: {x: 20, y: 480, fixed: false}
+  backdup0: {x: 233.51, y: 372.3}
+  checkdonedupx1: {x: 151.95, y: 480, fixed: false}
+  checkdonedupx0: {x: 123.57, y: 480, fixed: false}
+  leftv2: {x: 288.3, y: 480, fixed: false}
+  donemult: {x: 620.09, y: 236.07, fixed: false}
+  leftv3: {x: 416.2, y: 330.19}
+  rightv2: {x: 591.03, y: 205.62}
+  shiftAns: {x: 617.91, y: 71.89}
+  rightv3: {x: 460.92, y: 56.66, fixed: false}
+  shiftAns0: {x: 753.56, y: 62.1}
+  shiftAns1: {x: 434.8, y: 133.58}
+  back1shiftAns0: {x: 666.01, y: 20, fixed: false}
+  back1shiftAns1: {x: 381.91, y: 20, fixed: false}
+  backShiftAns: {x: 536.26, y: 20, fixed: false}
+  startmult: {x: 424.69, y: 480, fixed: false}
+  init: {x: 540.48, y: 480, fixed: false}
+  rightv0: {x: 673.87, y: 480, fixed: false}
+  readB: {x: 603.08, y: 332.11, fixed: false}
+  addA: {x: 424.49, y: 169.31, fixed: false}
+  doubleL: {x: 780, y: 405.86, fixed: false}
+  double: {x: 686.7, y: 96.27, fixed: false}
+  shift: {x: 780, y: 262.42, fixed: false}
+  shift0: {x: 780, y: 360.81, fixed: false}
+  shift1: {x: 780, y: 480, fixed: false}
+  tidyv0: {x: 780, y: 128.85, fixed: false}
+  read: {x: 284.87, y: 20, fixed: false}
+  have0: {x: 110.29, y: 20, fixed: false}
+  have1: {x: 140.42, y: 20, fixed: false}
+  add0: {x: 231.66, y: 20, fixed: false}
+  add1: {x: 20, y: 133.08, fixed: false}
+  carry: {x: 20, y: 20, fixed: false}
+  back0: {x: 85.74, y: 20, fixed: false}
+  back1: {x: 145.4, y: 71.68, fixed: false}
+  rewrite: {x: 485.69, y: 20, fixed: false}
+editor contents: |-
+  input: '11^100'
+  blank: ' '
+  start state: startExp
+  table:
+    startExp:
+      [0,1]: {L: initv1}
+    initv1:
+      ' ': {write: '|', L: initv2}
+    initv2:
+      ' ': {write: B, L: initv3}
+    initv3:
+      ' ': {write: 1, L: initv4}
+    initv4:
+      ' ': {write: '*', R: rightv1}
+    rightv1:
+      [0,1,'*','|','B','^']: R
+      ' ': {L: readC}
+      
+    readC:
+      0: {L: checkFull0}
+      1: {R: decrement}
+      
+    checkFull0:
+      0: {L: checkFull0}
+      '^': {R: rightv5}
+      1: {R: rightv4}
+      
+    rightv4:
+      [0,1]: {R: rightv4}
+      ' ': {L: decrement}
+      
+    rightv5:
+      0: {R: rightv5}
+      ' ': {L: tidyv1}
+      
+    tidyv1:
+      [0,1,'^','|']: {write: ' ', L: tidyv1}
+      'B': {write: ' ', L: tidyv2}
+    
+    tidyv2:
+      [0,1]: {L: tidyv2}
+      '*': {write: ' ', R: doneExp}
+      
+    doneExp:
+    
+    decrement:
+      ' ': {L: decrement}
+      1: {write: 0, L: leftv1}
+      0: {write: 1, L: decrement}
+      '^': {L: leftv1}
+      
+    leftv1:
+      [0,1]: {L: leftv1}
+      '^': {L: duplicateX}
+      
+    duplicateX:
+      1: {write: '_', L: dup1}
+      0: {write: '_', L: dup0}
+      
+    dup1:
+      [0,1,'|','*','B']: {L: dup1}
+      ' ': {write: 1, R: backDup1}
+    dup0:
+      [0,1,'|','*','B']: {L: dup0}
+      ' ': {write: 0, R: backDup0}
+    
+    backDup1:
+      '_': {write: 1, L: duplicateX}
+      [0,1,'*','B']: {R: backDup1}
+      '|': {R: checkDoneDupX1}
+    backDup0:
+      '_': {write: 0, L: duplicateX}
+      [0,1,'*','B']: {R: backDup0}
+      '|': {R: checkDoneDupX0}
+    
+    checkDoneDupX1:
+      '_': {write: 1, L: leftv2}
+      [0,1]: {R: backDup1}
+    checkDoneDupX0:
+      '_': {write: 0, L: leftv2}
+      [0,1]: {R: backDup0}
+      
+    leftv2:
+      [0,1,'*','|','B']: {L: leftv2}
+      ' ': {R: startMult}
+      
+    doneMult:
+      [0,1]: {L: leftv3}
+    
+    leftv3:
+      [0,1]: {L: leftv3}
+      ' ': {write: 's', R: rightv2}
+    rightv2:
+      [0,1]: {R: rightv2}
+      ' ': {L: shiftAns}
+      'B': {R: rightv1}
+      
+    shiftAns:
+      0: {write: 'b', R: shiftAns0}
+      1: {write: 'b', R: shiftAns1}
+      's': {write: ' ', R: rightv3}
+      
+    rightv3:
+      ' ': {R: rightv3}
+      [0,1]: {L: initv4}
+      
+    shiftAns0:
+      ' ': {R: shiftAns0}
+      [0,1,'B']: {L: back1ShiftAns0}
+    shiftAns1:
+      ' ': {R: shiftAns1}
+      [0,1,'B']: {L: back1ShiftAns1}
+      
+    back1ShiftAns0:
+      ' ': {write: 0, L: backShiftAns}
+    back1ShiftAns1:
+      ' ': {write: 1, L: backShiftAns}
+    
+    backShiftAns:
+      ' ': {L: backShiftAns}
+      'b': {write: ' ', L: shiftAns}
+      [0,1]: {R: rightv2}
+    
+    
+    
+    
+    
+    
+    # Prefix the input with a '+', and go to the rightmost digit.
+    startMult:
+      [0,1]: {L: initv0}
+    initv0:
+      ' ': {write: '+', R: rightv0}
+    rightv0:
+      [0,1,'*']: R
+      'B': {L: readB}
+
+    # Read and erase the last digit of the multiplier.
+    # If it's 1, add the current multiplicand.
+    # In any case, double the multiplicand afterwards.
+    readB:
+      0: {write: ' ', L: doubleL}
+      1: {write: ' ', L: addA}
+    addA:
+      [0,1]: L
+      '*': {L: read} # enter adder
+    # Double the multiplicand by appending a 0.
+    doubleL:
+      [0,1]: L
+      '*': {write: 0, R: shift}
+    double: # return from adder
+      [0,1,+]: R
+      '*': {write: 0, R: shift}
+    # Make room by shifting the multiplier right 1 cell.
+    shift:
+      0: {write: '*', R: shift0}
+      1: {write: '*', R: shift1}
+      ' ': {L: tidyv0} # base case: multiplier = 0
+    shift0:
+      0:   {R: shift0}
+      1:   {write: 0, R: shift1}
+      ' ': {write: 0, R: rightv0}
+    shift1:
+      0:   {write: 1, R: shift0}
+      1:   {R: shift1}
+      ' ': {write: 1, R: rightv0}
+
+    tidyv0:
+      [0,1]: {write: ' ', L}
+      +: {write: ' ', L: doneMult}
+
+  # This is the 'binary addition' machine almost verbatim.
+  # It's adjusted to keep the '+'
+  # and to lead to another state instead of halting.
+    read:
+      0: {write: c, L: have0}
+      1: {write: c, L: have1}
+      +: {L: rewrite} # keep the +
+    have0: {[0,1]: L, +: {L: add0}}
+    have1: {[0,1]: L, +: {L: add1}}
+    add0:
+      [0,' ']: {write: O, R: back0}
+      1      : {write: I, R: back0}
+      [O,I]  : L
+    add1:
+      [0,' ']: {write: I, R: back1}
+      1      : {write: O, L: carry}
+      [O,I]  : L
+    carry:
+      [0,' ']: {write: 1, R: back1}
+      1      : {write: 0, L}
+    back0:
+      [0,1,O,I,+]: R
+      c: {write: 0, L: read}
+    back1:
+      [0,1,O,I,+]: R
+      c: {write: 1, L: read}
+    rewrite:
+      O: {write: 0, L}
+      I: {write: 1, L}
+      [0,1]: L
+      ' ': {R: double} # when done, go to the 'double' state

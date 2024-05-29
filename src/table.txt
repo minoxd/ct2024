@@ -1,0 +1,225 @@
+(startExp, 0, initv1, L)
+(startExp, 1, initv1, L)
+
+(initv1, ' ', initv2, |, L)
+(initv2, ' ', initv3, B, L)
+(initv3, ' ', initv4, 1, L)
+(initv4, ' ', rightv1, *, R)
+
+(rightv1, 0, rightv1, R)
+(rightv1, 1, rightv1, R)
+(rightv1, *, rightv1, R)
+(rightv1, |, rightv1, R)
+(rightv1, B, rightv1, R)
+(rightv1, ^, rightv1, R)
+(rightv1, ' ', readC, L)
+
+(readC, 0, checkFull0, L)
+(readC, 1, decrement, R)
+
+(checkFull0, 0, checkFull0, L)
+(checkFull0, ^, rightv5, R)
+(checkFull0, 1, rightv4, R)
+
+(rightv4, 0, rightv4, R)
+(rightv4, 1, rightv4, R)
+(rightv4, ' ', decrement, L)
+
+(rightv5, 0, rightv5, R)
+(rightv5, ' ', tidyv1, L)
+
+(tidyv1, 0, tidyv1, ' ', L)
+(tidyv1, 1, tidyv1, ' ', L)
+(tidyv1, ^, tidyv1, ' ', L)
+(tidyv1, |, tidyv1, ' ', L)
+(tidyv1, B, tidyv2, ' ', L)
+
+(tidyv2, 0, tidyv2, L)
+(tidyv2, 1, tidyv2, L)
+(tidyv2, *, doneExp, ' ', R)
+
+(doneExp)
+
+(decrement, ' ', decrement, L)
+(decrement, 1, leftv1, 0, L)
+(decrement, 0, decrement, 1, L)
+(decrement, ^, leftv1, L)
+
+(leftv1, 0, leftv1, L)
+(leftv1, 1, leftv1, L)
+(leftv1, ^, duplicateX, L)
+
+(duplicateX, 1, dup1, _, L)
+(duplicateX, 0, dup0, _, L)
+
+(dup1, 0, dup1, L)
+(dup1, 1, dup1, L)
+(dup1, |, dup1, L)
+(dup1, *, dup1, L)
+(dup1, B, dup1, L)
+(dup1, ' ', backDup1, 1, R)
+
+(dup0, 0, dup0, L)
+(dup0, 1, dup0, L)
+(dup0, |, dup0, L)
+(dup0, *, dup0, L)
+(dup0, B, dup0, L)
+(dup0, ' ', backDup0, 0, R)
+
+(backDup1, '_', duplicateX, 1, L)
+(backDup1, 0, backDup1, R)
+(backDup1, 1, backDup1, R)
+(backDup1, *, backDup1, R)
+(backDup1, B, backDup1, R)
+(backDup1, |, checkDoneDupX1, R)
+
+(backDup0, '_', duplicateX, 0, L)
+(backDup0, 0, backDup0, R)
+(backDup0, 1, backDup0, R)
+(backDup0, *, backDup0, R)
+(backDup0, B, backDup0, R)
+(backDup0, |, checkDoneDupX0, R)
+
+(checkDoneDupX1, _, leftv2, 1, L)
+(checkDoneDupX1, 0, backDup1, R)
+(checkDoneDupX1, 1, backDup1, R)
+
+(checkDoneDupX0, _, leftv2, 0, L)
+(checkDoneDupX0, 0, backDup0, R)
+(checkDoneDupX0, 1, backDup0, R)
+
+(leftv2, 0, leftv2, L)
+(leftv2, 1, leftv2, L)
+(leftv2, *, leftv2, L)
+(leftv2, |, leftv2, L)
+(leftv2, B, leftv2, L)
+(leftv2, ' ', startMult, R)
+
+(doneMult, 0, leftv3, L)
+(doneMult, 1, leftv3, L)
+
+(leftv3, 0, leftv3, L)
+(leftv3, 1, leftv3, L)
+(leftv3, ' ', rightv2, s, R)
+
+(rightv2, 0, rightv2, R)
+(rightv2, 1, rightv2, R)
+(rightv2, ' ', shiftAns, L)
+(rightv2, B, rightv1, R)
+
+(shiftAns, 0, shiftAns0, b, R)
+(shiftAns, 1, shiftAns1, b, R)
+(shiftAns, s, rightv3, ' ', R)
+
+(rightv3, ' ', rightv3, R)
+(rightv3, 0, initv4, L)
+(rightv3, 1, initv4, L)
+
+(shiftAns0, ' ', shiftAns0, R)
+(shiftAns0, 0, back1ShiftAns0, L)
+(shiftAns0, 1, back1ShiftAns0, L)
+(shiftAns0, B, back1ShiftAns0, L)
+
+(shiftAns1, ' ', shiftAns1, R)
+(shiftAns1, 0, back1ShiftAns1, L)
+(shiftAns1, 1, back1ShiftAns1, L)
+(shiftAns1, B, back1ShiftAns1, L)
+
+(back1ShiftAns0, ' ', backShiftAns, 0, L)
+
+(back1ShiftAns1, ' ', backShiftAns, 1, L)
+
+(backShiftAns, ' ', backShiftAns, L)
+(backShiftAns, b, shiftAns, ' ', L)
+(backShiftAns, 0, rightv2, R)
+(backShiftAns, 1, rightv2, R)
+
+(startMult, 0, initv0, L)
+(startMult, 1, initv0, L)
+
+(initv0, ' ', rightv0, +, R)
+
+(rightv0, 0, rightv0, R)
+(rightv0, 1, rightv0, R)
+(rightv0, *, rightv0, R)
+(rightv0, B, readB, L)
+
+(readB, 0, doubleL, ' ', L)
+(readB, 1, addA, ' ', L)
+
+(addA, 0, addA, L)
+(addA, 1, addA, L)
+(addA, *, read, L)
+
+(doubleL, 0, doubleL, L)
+(doubleL, 1, doubleL, L)
+(doubleL, *, shift, 0, R)
+
+(double, 0, double, R)
+(double, 1, double, R)
+(double, +, double, R)
+(double, *, shift, 0, R)
+
+(shift, 0, shift0, *, R)
+(shift, 1, shift1, *, R)
+(shift, ' ', tidyv0, L)
+
+(shift0, 0, shift0, R)
+(shift0, 1, shift1, 0, R)
+(shift0, ' ', rightv0, 0, R)
+
+(shift1, 0, shift0, 1, R)
+(shift1, 1, shift1, R)
+(shift1, ' ', rightv0, 1, R)
+
+(tidyv0, 0, tidyv0, ' ', L)
+(tidyv0, 1, tidyv0, ' ', L)
+(tidyv0, +, doneMult, ' ', L)
+
+(read, 0, have0, c, L)
+(read, 1, have1, c, L)
+(read, +, rewrite, L)
+
+(have0, 0, have0, L)
+(have0, 1, have0, L)
+(have0, +, add0, L)
+
+(have1, 0, have1, L)
+(have1, 1, have1, L)
+(have1, +, add1, L)
+
+(add0, 0, back0, O, R)
+(add0, ' ', back0, O, R)
+(add0, 1, back0, I, R)
+(add0, O, add0, L)
+(add0, I, add0, L)
+
+(add1, 0, back1, I, R)
+(add1, ' ', back1, I, R)
+(add1, 1, carry, O, L)
+(add1, O, add1, L)
+(add1, I, add1, L)
+
+(carry, 0, back1, 1, R)
+(carry, ' ', back1, 1, R)
+(carry, 1, carry, 0, L)
+
+(back0, 0, back0, R)
+(back0, 1, back0, R)
+(back0, O, back0, R)
+(back0, I, back0, R)
+(back0, +, back0, R)
+(back0, c, read, 0, L)
+
+(back1, 0, back1, R)
+(back1, 1, back1, R)
+(back1, O, back1, R)
+(back1, I, back1, R)
+(back1, +, back1, R)
+(back1, c, read, 1, L)
+
+(rewrite, O, rewrite, 0, L)
+(rewrite, I, rewrite, 1, L)
+(rewrite, 0, rewrite, L)
+(rewrite, 1, rewrite, L)
+(rewrite, ' ', double, R)

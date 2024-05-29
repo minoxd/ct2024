@@ -1,10 +1,12 @@
+package pkg;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 
-public class Tape {
+public class TapeOld {
     private final LinkedList<String> tape;
 
-    public Tape() {
+    public TapeOld() {
         this.tape = new LinkedList<>();
     }
 

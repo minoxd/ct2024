@@ -1,52 +1,24 @@
-import java.util.Arrays;
+package pkg;
+
 import java.util.LinkedList;
 
-public class TuringMachine  {
-    private final ControlUnit cu;
-
-    public TuringMachine () {
-        this.cu = new ControlUnit();
-    }
-
-    public static void main(String[] args) {
-        System.out.println("Initializing program...");
-        System.out.println("""
-                Previously in the paper question,\s
-                I wrote that such turing machine that can compute exponentiation does not exist.\s
-                Now i am here to prove my self wrong.""");
-        TuringMachine  tm = new TuringMachine ();
-
-        try {
-            String[] tape = {"1", "1", "^", "1", "0", "1"};
-            tm.cu.initTape(tape);
-            tm.perform();
-            System.out.println("\nGood bye.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-
-    private void perform() {
-        cu.beforeRun();
-        cu.startExp();
-        cu.printSteps();
-    }
-}
-
-class ControlUnit {
-    private final Tape  t;
+public class ControlUnitOld {
+    private final TapeOld t;
     private int location;
     private final StringBuilder runningSteps;
 
-    public ControlUnit() {
-        this.t = new Tape ();
+    public ControlUnitOld() {
+        this.t = new TapeOld();
         this.location = 0;
         this.runningSteps = new StringBuilder();
     }
 
     public void initTape(String[] strings) {
         t.init(strings);
+    }
+
+    public LinkedList<String> getTape() {
+        return t.getTape();
     }
 
     public void beforeRun() {
@@ -63,7 +35,7 @@ class ControlUnit {
         }
         String afterLocation =
                 String.join(" ", t.getTape().subList(location + 1, t.getTape().size())) +
-                        " ";
+                " ";
         return beforeLocation + theLocation + afterLocation + "\n";
     }
 
@@ -94,7 +66,7 @@ class ControlUnit {
     public void startExp() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(startExp, %s, initv1, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -145,11 +117,11 @@ class ControlUnit {
     private void rightv1() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("*") ||
-                        t.getElement(location).equals("|") ||
-                        t.getElement(location).equals("B") ||
-                        t.getElement(location).equals("^")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("*") ||
+                t.getElement(location).equals("|") ||
+                t.getElement(location).equals("B") ||
+                t.getElement(location).equals("^")) {
             String fiveTuple = String.format("(rightv1, %s, rightv1, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -202,7 +174,7 @@ class ControlUnit {
     private void rightv4() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(rightv4, %s, rightv4, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -234,9 +206,9 @@ class ControlUnit {
     private void tidyv1() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("^") ||
-                        t.getElement(location).equals("|")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("^") ||
+                t.getElement(location).equals("|")) {
             String fiveTuple = String.format("(tidyv1, %s, tidyv1,  , L)\n", t.getElement(location));
             t.setElement(location, " ");
             locationDecrement();
@@ -255,7 +227,7 @@ class ControlUnit {
     private void tidyv2() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(tidyv2, %s, tidyv2, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -306,7 +278,7 @@ class ControlUnit {
     private void leftv1() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(leftv1, %s, leftv1, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -340,10 +312,10 @@ class ControlUnit {
     private void dup1() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("|") ||
-                        t.getElement(location).equals("*") ||
-                        t.getElement(location).equals("B")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("|") ||
+                t.getElement(location).equals("*") ||
+                t.getElement(location).equals("B")) {
             String fiveTuple = String.format("(dup1, %s, dup1, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -361,10 +333,10 @@ class ControlUnit {
     private void dup0() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("|") ||
-                        t.getElement(location).equals("*") ||
-                        t.getElement(location).equals("B")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("|") ||
+                t.getElement(location).equals("*") ||
+                t.getElement(location).equals("B")) {
             String fiveTuple = String.format("(dup0, %s, dup0, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -389,9 +361,9 @@ class ControlUnit {
         } else
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("*") ||
-                        t.getElement(location).equals("B")) {
+                    t.getElement(location).equals("1") ||
+                    t.getElement(location).equals("*") ||
+                    t.getElement(location).equals("B")) {
             String fiveTuple = String.format("(backDup1, %s, backDup1, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -415,9 +387,9 @@ class ControlUnit {
         } else
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("*") ||
-                        t.getElement(location).equals("B")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("*") ||
+                t.getElement(location).equals("B")) {
             String fiveTuple = String.format("(backDup0, %s, backDup0, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -459,7 +431,7 @@ class ControlUnit {
         } else
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(checkDoneDupX0, %s, backDup0, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -470,10 +442,10 @@ class ControlUnit {
     private void leftv2() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("*") ||
-                        t.getElement(location).equals("|") ||
-                        t.getElement(location).equals("B")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("*") ||
+                t.getElement(location).equals("|") ||
+                t.getElement(location).equals("B")) {
             String fiveTuple = String.format("(leftv2, %s, leftv2, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -490,7 +462,7 @@ class ControlUnit {
     private void doneMult() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(doneMult, %s, leftv3, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -501,7 +473,7 @@ class ControlUnit {
     private void leftv3() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(leftv3, %s, leftv3, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -519,7 +491,7 @@ class ControlUnit {
     private void rightv2() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(rightv2, %s, rightv2, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -572,7 +544,7 @@ class ControlUnit {
         } else
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(rightv3, %s, initv4, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -607,8 +579,8 @@ class ControlUnit {
         } else
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("B")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("B")) {
             String fiveTuple = String.format("(shiftAns1, %s, back1ShiftAns1, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -652,7 +624,7 @@ class ControlUnit {
         } else
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(backShiftAns, %s, rightv2, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -663,7 +635,7 @@ class ControlUnit {
     private void startMult() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(startMult, %s, initv0, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -685,8 +657,8 @@ class ControlUnit {
     private void rightv0() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("*")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("*")) {
             String fiveTuple = String.format("(rightv0, %s, rightv0, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -720,7 +692,7 @@ class ControlUnit {
     private void addA() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(addA, %s, addA, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -737,7 +709,7 @@ class ControlUnit {
     private void doubleL() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(doubleL, %s, doubleL, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -755,12 +727,13 @@ class ControlUnit {
     private void doublee() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("+")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("+")) {
             String fiveTuple = String.format("(double, %s, double, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
             doublee();
+            return;
         } else
         if (t.getElement(location).equals("*")) {
             String fiveTuple = String.format("(double, %s, shift, 0, R)\n", t.getElement(location));
@@ -843,7 +816,7 @@ class ControlUnit {
     private void tidyv0() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(tidyv0, %s, tidyv0,  , L)\n", t.getElement(location));
             t.setElement(location, " ");
             locationDecrement();
@@ -885,7 +858,7 @@ class ControlUnit {
     private void have0() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(have0, %s, have0, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -902,7 +875,7 @@ class ControlUnit {
     private void have1() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(have1, %s, have1, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -919,7 +892,7 @@ class ControlUnit {
     private void add0() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals(" ")) {
+                t.getElement(location).equals(" ")) {
             String fiveTuple = String.format("(add0, %s, back0, O, R)\n", t.getElement(location));
             t.setElement(location, "O");
             locationIncrement();
@@ -935,7 +908,7 @@ class ControlUnit {
         } else
         if (
                 t.getElement(location).equals("O") ||
-                        t.getElement(location).equals("I")) {
+                t.getElement(location).equals("I")) {
             String fiveTuple = String.format("(add0, %s, add0, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -946,7 +919,7 @@ class ControlUnit {
     private void add1() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals(" ")) {
+                t.getElement(location).equals(" ")) {
             String fiveTuple = String.format("(add1, %s, back1, I, R)\n", t.getElement(location));
             t.setElement(location, "I");
             locationIncrement();
@@ -962,7 +935,7 @@ class ControlUnit {
         } else
         if (
                 t.getElement(location).equals("O") ||
-                        t.getElement(location).equals("I")) {
+                t.getElement(location).equals("I")) {
             String fiveTuple = String.format("(add1, %s, add1, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -973,7 +946,7 @@ class ControlUnit {
     private void carry() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals(" ")) {
+                t.getElement(location).equals(" ")) {
             String fiveTuple = String.format("(carry, %s, back1, 1, R)\n", t.getElement(location));
             t.setElement(location, "1");
             locationIncrement();
@@ -992,10 +965,10 @@ class ControlUnit {
     private void back0() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("O") ||
-                        t.getElement(location).equals("I") ||
-                        t.getElement(location).equals("+")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("O") ||
+                t.getElement(location).equals("I") ||
+                t.getElement(location).equals("+")) {
             String fiveTuple = String.format("(back0, %s, back0, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -1013,10 +986,10 @@ class ControlUnit {
     private void back1() {
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1") ||
-                        t.getElement(location).equals("O") ||
-                        t.getElement(location).equals("I") ||
-                        t.getElement(location).equals("+")) {
+                t.getElement(location).equals("1") ||
+                t.getElement(location).equals("O") ||
+                t.getElement(location).equals("I") ||
+                t.getElement(location).equals("+")) {
             String fiveTuple = String.format("(back1, %s, back1, R)\n", t.getElement(location));
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
@@ -1048,49 +1021,17 @@ class ControlUnit {
         } else
         if (
                 t.getElement(location).equals("0") ||
-                        t.getElement(location).equals("1")) {
+                t.getElement(location).equals("1")) {
             String fiveTuple = String.format("(rewrite, %s, rewrite, L)\n", t.getElement(location));
             locationDecrement();
             runningSteps.append(fiveTuple).append(displayTape());
             rewrite();
         }
         if (t.getElement(location).equals(" ")) {
-            String fiveTuple = String.format("(rewrite, %s, double, R)\n", t.getElement(location));
+            String fiveTuple = String.format("(rewrite, %s, double, R)\n", t.getElement(location));;
             locationIncrement();
             runningSteps.append(fiveTuple).append(displayTape());
             doublee();
         }
-    }
-}
-
-class Tape {
-    private final LinkedList<String> tape;
-
-    public Tape() {
-        this.tape = new LinkedList<>();
-    }
-
-    public void init(String[] strings) {
-        tape.addAll(Arrays.asList(strings));
-    }
-
-    public LinkedList<String> getTape() {
-        return tape;
-    }
-
-    public String getElement(int index) {
-        return tape.get(index);
-    }
-
-    public void setElement(int index, String string) {
-        tape.set(index, string);
-    }
-
-    public void addFirst(String string) {
-        tape.addFirst(string);
-    }
-
-    public void addLast(String string) {
-        tape.addLast(string);
     }
 }
